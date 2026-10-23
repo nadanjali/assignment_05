@@ -52,7 +52,6 @@ def clean_employee_id(ids: pd.Series) -> pd.Series:
     - The mistake people make: stopping after `.upper()`. `"E4"` is not `"E004"`,
       and Step 2's merge will not match it to anyone on the roster.
     """
-    # TODO: your code here
     ids = ids.str.strip().str.upper()
     digits = ids.str[1:]
     digits = digits.str.zfill(3)
@@ -86,7 +85,6 @@ def clean_number(values: pd.Series) -> pd.Series:
     - This is `clean_currency` from Assignment 04, with no `apply` — the `.str`
       methods do the looping for you.
     """
-    # TODO: your code here
     cleaned = values.str.replace("$", "", regex=False).str.replace(",", "", regex=False).str.strip()
     numeric = pd.to_numeric(cleaned, errors="coerce").fillna(0.0)
     return numeric
@@ -115,7 +113,6 @@ def parse_pay_date(values: pd.Series) -> pd.Series:
       single format cannot read both styles — and guessing (leaving `format=` off)
       is how `"03/04/2026"` silently becomes April 3rd on someone's laptop.
     """
-    # TODO: your code here
     us = pd.to_datetime(values, format="%m/%d/%Y", errors="coerce")
     iso = pd.to_datetime(values, format="%Y-%m-%d", errors="coerce")
     return us.fillna(iso)
@@ -136,7 +133,6 @@ def combine_exports(exports: list) -> pd.DataFrame:
       you write returns a DataFrame where you expected a row.
     - No `.copy()` needed — `concat` always builds a new frame.
     """
-    # TODO: your code here
     return pd.concat(exports, ignore_index=True)
 
 
@@ -164,7 +160,6 @@ def add_clean_columns(history: pd.DataFrame) -> pd.DataFrame:
     - Why name the new column `employee_id` and not `employeeid_clean`? Because
       that is what the roster calls it, and Step 2 merges on it with `on=`.
     """
-    # TODO: your code here
     out = history.copy()
     out["employee_id"] = clean_employee_id(out["employeeid"])
     out["pay_date"] = parse_pay_date(out["payrolldate"])
@@ -193,7 +188,6 @@ def add_date_parts(history: pd.DataFrame) -> pd.DataFrame:
       from lesson 3-6: `%Y` year, `%m` month, `%d` day.)
     - `return out`. Requires `pay_date`, so it runs after `add_clean_columns`.
     """
-    # TODO: your code here
     out = history.copy()
     out["week_ending"] = out["pay_date"].dt.strftime("%Y-%m-%d")
     out["month"] = out["pay_date"].dt.strftime("%Y-%m")

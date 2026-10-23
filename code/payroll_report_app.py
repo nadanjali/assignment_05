@@ -95,7 +95,9 @@ if uploads:
         .drop_duplicates()
     )
     if unmatched:
-        st.warning(f"Unmatched employee IDs were left out of the report: {', '.join(unmatched)}")
+        st.warning(
+            f"Unmatched employee IDs were left out of the report: {', '.join(unmatched)}"
+            )
 
     matched = history[history["department"].notna()].copy()
     departments = ["All"] + sorted(matched["department"].dropna().unique().tolist())
