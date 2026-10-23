@@ -152,5 +152,3 @@ if uploads:
         file_name="payroll_report.csv",
         key="download",
     )
-
-
