@@ -39,9 +39,8 @@ def hours_grid(history: pd.DataFrame) -> pd.DataFrame:
         index=employee_columns,
         columns="week_ending",
         values="hours_worked",
-        fill_value=0
+        fill_value=0,
     ).reset_index()
-    grid.columns.name = None  # remove the name of the columns index
     return grid
     
 
@@ -84,8 +83,6 @@ def pay_by_month(history: pd.DataFrame) -> pd.DataFrame:
         columns="department",
         values="gross_pay",
         aggfunc="sum",
-        fill_value=0.0
+        fill_value=0.0,
     ).reset_index()
-    pay_grid.columns.name = None  # remove the name of the columns index
     return pay_grid
-    pass

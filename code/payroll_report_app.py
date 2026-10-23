@@ -44,3 +44,103 @@ Test it: pytest tests/test_pipeline.py -k app
 #
 # What the page does NOT do: cleaning, grouping, pivoting. If you find yourself
 # writing a groupby or a pivot_table here, that logic belongs in the package.
+
+import streamlit as st
+import pandas as pd
+
+from payroll import (
+    build_history,
+    clean_employee_id,
+    hours_grid,
+    load_employees,
+    load_export,
+    missed_weeks,
+    pay_by_month,
+    summarize_employees,
+)
+
+st.title("Salt City Coffee — Quarterly Payroll Report")
+st.write(
+    "Upload the weekly payroll exports for the period you want to review — old "
+    "spreadsheet weeks and new app weeks can be mixed. The roster is loaded "
+    "automatically."
+)
+
+roster = load_employees()
+uploads = st.file_uploader(
+    "Upload weekly payroll exports (CSV)",
+    type="csv",
+    accept_multiple_files=True,
+    key="exports",
+)
+
+if uploads:
+    uploads_for_history = []
+    for upload in uploads:
+        upload.seek(0)
+        uploads_for_history.append(load_export(upload))
+    history = build_history(uploads_for_history, roster)
+
+    raw_exports = []
+    for upload in uploads:
+        upload.seek(0)
+        raw_exports.append(load_export(upload))
+    raw_exports = pd.concat(raw_exports, ignore_index=True)
+    raw_exports["employee_id"] = clean_employee_id(raw_exports["employeeid"])
+    roster_ids = set(roster["employee_id"])
+    unmatched = sorted(
+        raw_exports.loc[~raw_exports["employee_id"].isin(roster_ids), "employeeid"]
+        .str.strip()
+        .str.upper()
+        .drop_duplicates()
+    )
+    if unmatched:
+        st.warning(f"Unmatched employee IDs were left out of the report: {', '.join(unmatched)}")
+
+    matched = history[history["department"].notna()].copy()
+    departments = ["All"] + sorted(matched["department"].dropna().unique().tolist())
+    department = st.selectbox("Department", departments, key="department")
+
+    if department != "All":
+        matched = matched[matched["department"] == department]
+
+    start = matched["pay_date"].min().date() if not matched.empty else pd.Timestamp("2026-01-01").date()
+    end = matched["pay_date"].max().date() if not matched.empty else pd.Timestamp("2026-12-31").date()
+    selected_range = st.date_input("Date range", (start, end), key="dates")
+    if isinstance(selected_range, tuple) and len(selected_range) == 2:
+        start, end = selected_range
+    if hasattr(start, "date"):
+        start = start.date()
+    if hasattr(end, "date"):
+        end = end.date()
+
+    selected = matched[
+        (matched["pay_date"].dt.date >= start) & (matched["pay_date"].dt.date <= end)
+    ].copy()
+
+    st.subheader(
+        f"Selected: {department if department != 'All' else 'All departments'} — "
+        f"{start.isoformat()} to {end.isoformat()}"
+    )
+
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Weeks", str(selected["week_ending"].nunique()))
+    col2.metric("Employees", str(selected["employee_id"].nunique()))
+    col3.metric("Total hours", f"{selected['hours_worked'].sum():,.2f}")
+    col4.metric("Total gross pay", f"${selected['gross_pay'].sum():,.2f}")
+
+    monthly = pay_by_month(selected)
+    st.bar_chart(monthly, x="month")
+
+    st.dataframe(summarize_employees(selected))
+    grid = hours_grid(selected)
+    st.dataframe(grid)
+    st.dataframe(missed_weeks(grid))
+    st.download_button(
+        label="Download CSV",
+        data=monthly.to_csv(index=False),
+        file_name="payroll_report.csv",
+        key="download",
+    )
+
+

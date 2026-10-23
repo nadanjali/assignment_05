@@ -116,6 +116,6 @@ def summarize_employees(history: pd.DataFrame) -> pd.DataFrame:
         total_hours=("hours_worked", "sum"),
         total_pay=("gross_pay", lambda x: round(x.sum(), 2)),
         avg_hours=("hours_worked", lambda x: round(x.mean(), 2)),
-        overtime_weeks=("hours_worked", lambda x: (x > 40.0).sum())
+        overtime_weeks=("hours_worked", lambda x: (x > 40.0).sum()),
     ).reset_index()
-    pass
+    return summary
