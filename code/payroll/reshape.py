@@ -59,7 +59,11 @@ def missed_weeks(grid: pd.DataFrame) -> pd.DataFrame:
         var_name="week_ending",
         value_name="hours_worked"
     )
-    missed = melted[melted["hours_worked"] == 0].sort_values(by=["employee_id", "week_ending"]).reset_index(drop=True)
+    missed = (
+        melted[melted["hours_worked"] == 0]
+        .sort_values(by=["employee_id", "week_ending"])
+        .reset_index(drop=True)
+    )
     return missed
 
 
