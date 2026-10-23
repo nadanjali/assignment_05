@@ -96,7 +96,7 @@ if uploads:
     )
     if unmatched:
         st.warning(
-            f"Unmatched employee IDs were left out of the report: {', '.join(unmatched)}"
+            f"Unmatched employee IDs are left out of the report: {', '.join(unmatched)}"
             )
 
     matched = history[history["department"].notna()].copy()
