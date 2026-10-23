@@ -106,8 +106,16 @@ if uploads:
     if department != "All":
         matched = matched[matched["department"] == department]
 
-    start = matched["pay_date"].min().date() if not matched.empty else pd.Timestamp("2026-01-01").date()
-    end = matched["pay_date"].max().date() if not matched.empty else pd.Timestamp("2026-12-31").date()
+    start = (
+        matched["pay_date"].min().date()
+        if not matched.empty
+        else pd.Timestamp("2026-01-01").date()
+    )
+    end = (
+        matched["pay_date"].max().date()
+        if not matched.empty
+        else pd.Timestamp("2026-12-31").date()
+    )
     selected_range = st.date_input("Date range", (start, end), key="dates")
     if isinstance(selected_range, tuple) and len(selected_range) == 2:
         start, end = selected_range
