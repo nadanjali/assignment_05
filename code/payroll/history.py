@@ -93,6 +93,7 @@ def clean_number(values: pd.Series) -> pd.Series:
     numeric = pd.to_numeric(cleaned, errors="coerce").fillna(0.0)
     return numeric
 
+
 def parse_pay_date(values: pd.Series) -> pd.Series:
     """Parse pay dates written either way; return a datetime Series. Unreadable -> NaT.
 

@@ -1,7 +1,2 @@
-Write your reflection here.
 
-See reflection.md for what makes a good reflection — be specific, use the
-terminology from this assignment (grain, long vs. wide, vectorized .str methods,
-coerce, NaT, pd.to_datetime format, .dt, concat, ignore_index, group by, named
-aggregation, reset_index, pivot_table, fill_value, melt, lineage), and make it
-actionable.
+In this assignment I learned how to modify and strip data within dataframes so that they can be cleaned and merged for a better analysis and understanding with real life scenarios. I used the strip, datetime, and added columns to tables in order to get a better picture of employee data. One part where I aim to improve is melting and pivoting because I still am a bit confused on just what parameters are needed and how to created merged tables completely.
